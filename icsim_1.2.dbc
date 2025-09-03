@@ -1,0 +1,88 @@
+VERSION "icsim_reverse_engineered_1.0"
+
+NS_ :
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_TYPE_REF_
+    VAL_TABLE_
+    SIG_GROUP_
+    SIG_VALTYPE_
+    SIGTYPE_VALTYPE_
+    BO_TX_BU_
+    BA_DEF_REL_
+    BA_REL_
+    BA_DEF_DEF_REL_
+    BU_SG_REL_
+    BU_EV_REL_
+    BU_BO_REL_
+    SG_MUL_VAL_
+
+BS_:
+
+BU_: ICSIM
+
+CM_ "Reverse-engineered DBC for ICSim: indicators (0x188), doors (0x19B), speed (0x244).";
+
+//////////////////////////////////////////////////////////////////
+// Indicators (turn signals)
+// ID: 0x188 (392 decimal)
+// Byte 0: 0 = Off, 1 = Left, 2 = Right
+//////////////////////////////////////////////////////////////////
+BO_ 392 INDICATORS: 4 ICSIM
+ SG_ TurnSignal : 0|8@1+ (1,0) [0|2] "" ICSIM
+CM_ BO_ 392 "Indicator message: 0=Off,1=Left,2=Right (byte0).";
+CM_ SG_ 392 TurnSignal "Turn signal enum: 0=Off,1=Left,2=Right";
+VAL_ 392 TurnSignal 0 "Off" 1 "Left" 2 "Right" ;
+
+//////////////////////////////////////////////////////////////////
+// Doors
+// ID: 0x19B (411 decimal)
+// Byte index 2 (third byte) contains bitmask:
+// bit0 (0x01) = Door1 (Front Left)
+// bit1 (0x02) = Door2 (Front Right)
+// bit2 (0x04) = Door3 (Rear Left)
+// bit3 (0x08) = Door4 (Rear Right)
+//////////////////////////////////////////////////////////////////
+BO_ 411 DOORS: 6 ICSIM
+ SG_ Door1_FrontLeft  : 16|1@1+ (1,0) [0|1] "" ICSIM
+ SG_ Door2_FrontRight : 17|1@1+ (1,0) [0|1] "" ICSIM
+ SG_ Door3_RearLeft   : 18|1@1+ (1,0) [0|1] "" ICSIM
+ SG_ Door4_RearRight  : 19|1@1+ (1,0) [0|1] "" ICSIM
+
+CM_ BO_ 411 "Door status message; bits in byte 2 (third byte).";
+CM_ SG_ 411 Door1_FrontLeft  "bitmask 0x01 - Front Left door (0=Closed, 1=Open)";
+CM_ SG_ 411 Door2_FrontRight "bitmask 0x02 - Front Right door (0=Closed, 1=Open)";
+CM_ SG_ 411 Door3_RearLeft   "bitmask 0x04 - Rear Left door (0=Closed, 1=Open)";
+CM_ SG_ 411 Door4_RearRight  "bitmask 0x08 - Rear Right door (0=Closed, 1=Open)";
+
+VAL_ 411 Door1_FrontLeft  0 "Open" 1 "Closed" ;
+VAL_ 411 Door2_FrontRight 0 "Open" 1 "Closed" ;
+VAL_ 411 Door3_RearLeft   0 "Open" 1 "Closed" ;
+VAL_ 411 Door4_RearRight  0 "Open" 1 "Closed" ;
+
+//////////////////////////////////////////////////////////////////
+// Speedometer
+// ID: 0x244 (580 decimal)
+// Bytes 3-4 (4th and 5th bytes) carry a 16-bit value.
+// We use little-endian (Intel) interpretation: start bit 24, 16 bits.
+// Provisional scale based on measurements: 0.006629 mph per raw unit.
+// Refine later with more samples if needed.
+//////////////////////////////////////////////////////////////////
+BO_ 580 SPEED: 5 ICSIM
+ SG_ VehicleSpeed : 24|16@1+ (0.006629,0) [0|500] "mph" ICSIM
+CM_ BO_ 580 "Vehicle speed message (bytes 3-4, little-endian).";
+CM_ SG_ 580 VehicleSpeed "Vehicle speed in MPH (scale ~0.006629 mph per raw unit).";
+
